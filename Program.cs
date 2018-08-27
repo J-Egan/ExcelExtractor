@@ -19,6 +19,8 @@ namespace ExcelExtractor
              * Excel data extractor
              */
 
+            List<String> conditions = new List<string>();
+
             Console.Title = "Excel Data Extractor";
 
             Console.ForegroundColor = ConsoleColor.White;
@@ -47,10 +49,9 @@ namespace ExcelExtractor
             //gather search conditions from user
             bool searchAll = false;
             int searchRange = 0;
-            string searchText = "";
 
             Console.Clear();
-            DisplayMenu(ref searchAll,ref searchRange,ref searchText);
+            DisplayMenu(ref searchAll,ref searchRange,ref conditions);
 
             //decide what is going to be searched
             if (searchAll)
@@ -101,11 +102,14 @@ namespace ExcelExtractor
                         }
                     }
                     //Check if the current row contains the text the user wants to search for
-                    if (row.Contains(searchText))
+                    foreach (string c in conditions)
                     {
-                        //if the text is found, add the sheet title to the front and add it to the list of text files
-                        row = xlWorksheet.Name + row;
-                        matchRows.Add(row);
+                        if (row.Contains(c))
+                        {
+                            //if the text is found, add the sheet title to the front and add it to the list of text files
+                            row = xlWorksheet.Name + row;
+                            matchRows.Add(row);
+                        }
                     }
 
                     //reset the row for the next iteration
@@ -162,8 +166,7 @@ namespace ExcelExtractor
             xlApp.Quit();
             Marshal.ReleaseComObject(xlApp);
         }
-        public static void DisplayMenu(ref bool searchAll, ref int searchRange, ref string searchText) {
-
+        public static void DisplayMenu(ref bool searchAll, ref int searchRange, ref List<string>conditions) {
             Console.WriteLine("Do you want to search the entire file?");
             Console.WriteLine("Enter Y/N");
             string userInput = Convert.ToString(Console.ReadLine()).ToLower();
@@ -179,12 +182,25 @@ namespace ExcelExtractor
             {
                 searchAll = true;
             }
+            
+            //Ask the user if they want to search for more than one Item in the excel doc
+            //Keep adding items
+            do
+            {
+                Console.Clear();
+                userInput = "";
+                Console.WriteLine("Enter the text you want to search for");
+                Console.WriteLine("This text needs to be exact, case sensitive and must include any text modifiers");
+                conditions.Add(Console.ReadLine());
 
-            Console.Clear();
-            Console.WriteLine("Enter the text you want to search for");
-            Console.WriteLine("This text needs to be exact, case sensitive and must include any text modifiers");
-            searchText = Console.ReadLine();
-            Console.Clear();
+                Console.Clear();
+
+                Console.WriteLine("Do you want to search for more items?");
+                Console.WriteLine("Y/N");
+                userInput = Console.ReadLine().ToLower();
+            } while (userInput != "n");
+
+           
         }
     }
 }
