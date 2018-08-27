@@ -86,6 +86,9 @@ namespace ExcelExtractor
                 xlWorksheet = xlWorkbook.Sheets[l];
                 xlRange = xlWorksheet.UsedRange;
 
+                rowCount = xlRange.Rows.Count;
+                colCount = xlRange.Columns.Count;
+
                 for (int i = 1; i <= rowCount; i++)
                 {
                     for (int j = 1; j <= colCount; j++)
